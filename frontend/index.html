@@ -1,105 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>AI Spam Detection</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            width: 400px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-        }
-        textarea {
-            width: 100%;
-            height: 80px;
-            padding: 10px;
-            margin-top: 10px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 15px;
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        .result {
-            margin-top: 15px;
-            padding: 10px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .spam {
-            color: red;
-        }
-        .not-spam {
-            color: green;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>AI Spam Detector</title>
 </head>
 <body>
 
-<div class="container">
-    <h2>AI Spam Detector</h2>
-    <textarea id="message" placeholder="Enter your message..."></textarea>
-    <button onclick="checkSpam()">Check Spam</button>
-    <div id="result" class="result"></div>
-</div>
+  <h2>AI Spam Detector</h2>
 
-<script>
+  <textarea id="text" rows="5" cols="40"
+    placeholder="Enter a message to check for spam"></textarea>
+  <br><br>
+
+  <button onclick="checkSpam()">Check Spam</button>
+
+  <p id="result"></p>
+
+  <script>
     async function checkSpam() {
-        const text = document.getElementById("message").value;
-        const resultDiv = document.getElementById("result");
+      const message = document.getElementById("text").value;
 
-        if (!text) {
-            resultDiv.innerHTML = "Please enter some text.";
-            return;
+      if (!message) {
+        alert("Please enter a message");
+        return;
+      }
+
+      const response = await fetch(
+        "https://ai-spam-detector-3zap.onrender.com/predict",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ text: message })
         }
+      );
 
-        resultDiv.innerHTML = "Checking...";
+      const data = await response.json();
 
-        try {
-            const response = await fetch("http://127.0.0.1:8000/predict", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ text: text })
-            });
-
-            const data = await response.json();
-
-            if (data.prediction === "Spam") {
-                resultDiv.innerHTML = `🚫 SPAM (${data.spam_confidence}%)`;
-                resultDiv.className = "result spam";
-            } else {
-                resultDiv.innerHTML = `✅ NOT SPAM (${data.spam_confidence}%)`;
-                resultDiv.className = "result not-spam";
-            }
-
-        } catch (error) {
-            resultDiv.innerHTML = "Error connecting to server";
-        }
+      document.getElementById("result").innerText =
+        `Prediction: ${data.prediction} (Confidence: ${data.spam_confidence}%)`;
     }
-</script>
+  </script>
 
 </body>
 </html>
