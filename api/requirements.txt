@@ -4,6 +4,3 @@ scikit-learn
 joblib
 psycopg2-binary
 numpy
-
-
-Use psycopg2-binary, not psycopg2 (Render needs this)
