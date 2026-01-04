@@ -4,7 +4,6 @@ from pydantic import BaseModel
 import joblib
 import psycopg2
 from fastapi.middleware.cors import CORSMiddleware
-
 # -------------------- APP --------------------
 app = FastAPI(title="AI Spam Detection API")
 
@@ -32,7 +31,7 @@ except Exception as e:
 def get_db_connection():
     try:
         return psycopg2.connect(
-            host=os.getenv("DB_HOST", "db.ndftnttxjwflywterduv.supabase.co"),
+            host=os.getenv("DB_HOST", "db.ndftnttxjwflywterduv.supabase.com"),
             database=os.getenv("DB_NAME", "postgres"),
             user=os.getenv("DB_USER", "postgres"),
             password=os.getenv("DB_PASSWORD", "Supabase@2026"),
