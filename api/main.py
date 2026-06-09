@@ -31,10 +31,10 @@ except Exception as e:
 def get_db_connection():
     try:
         return psycopg2.connect(
-            host=os.getenv("DB_HOST", "aws-1-ap-southeast-1.pooler.supabase.com"),
-            database=os.getenv("DB_NAME", "postgres"),
-            user=os.getenv("DB_USER", "postgres.ndftnttxjwflywterduv"),
-            password=os.getenv("DB_PASSWORD", "Supabase@2026"),
+            host=os.getenv("DB_HOST"),
+            database=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
             port=os.getenv("DB_PORT", "6543"),
         )
     except Exception as e:
