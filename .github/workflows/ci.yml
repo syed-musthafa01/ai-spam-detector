@@ -1,0 +1,93 @@
+name: CI/CD — AI Spam Detector
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  # ══════════════════════════════════════════════
+  # JOB 1 — Test (runs on every push and PR)
+  # ══════════════════════════════════════════════
+  test:
+    name: Test backend
+    runs-on: ubuntu-latest
+
+    env:
+      # Only the password is a secret — everything else is fine public
+      DB_HOST:     aws-1-ap-southeast-1.pooler.supabase.com
+      DB_NAME:     postgres
+      DB_USER:     postgres.ndftnttxjwflywterduv
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_PORT:     "6543"
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest flake8
+
+      - name: Lint code
+        run: |
+          flake8 api/ --max-line-length=100 --ignore=E501,W503
+        continue-on-error: true
+
+      - name: Verify imports load correctly
+        run: |
+          python -c "import fastapi, sklearn, joblib, numpy, psycopg2; print('All imports OK')"
+
+      - name: Run tests
+        run: pytest tests/ -v --tb=short
+
+  # ══════════════════════════════════════════════
+  # JOB 2 — Deploy backend to Render
+  # Only on push to main, only if tests pass
+  # ══════════════════════════════════════════════
+  deploy-backend:
+    name: Deploy backend → Render
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+
+      - name: Trigger Render deploy
+        run: |
+          curl --silent --show-error --fail --max-time 30 \
+            -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+          echo "Render deploy triggered"
+
+  # ══════════════════════════════════════════════
+  # JOB 3 — Netlify deploys automatically
+  # via its GitHub integration — no action needed
+  # ══════════════════════════════════════════════
+  deploy-frontend:
+    name: Deploy frontend → Netlify
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+
+      - name: Netlify auto-deploys from main
+        run: echo "Netlify detects the push and redeploys frontend automatically"
