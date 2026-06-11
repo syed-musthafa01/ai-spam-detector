@@ -5,6 +5,8 @@ import joblib
 import psycopg2
 from fastapi.middleware.cors import CORSMiddleware
 # -------------------- APP --------------------
+
+
 app = FastAPI(title="AI Spam Detection API")
 
 app.add_middleware(
@@ -15,12 +17,16 @@ app.add_middleware(
 )
 
 # -------------------- PATHS --------------------
+
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 MODEL_PATH = os.path.join(BASE_DIR, "..", "model", "spam_model.pkl")
 VECTORIZER_PATH = os.path.join(BASE_DIR, "..", "model", "vectorizer.pkl")
 
 # -------------------- LOAD MODEL --------------------
+
+
 try:
     model = joblib.load(MODEL_PATH)
     vectorizer = joblib.load(VECTORIZER_PATH)
@@ -28,6 +34,8 @@ except Exception as e:
     raise RuntimeError(f"Model loading failed: {e}")
 
 # -------------------- DATABASE --------------------
+
+
 def get_db_connection():
     try:
         return psycopg2.connect(
@@ -42,10 +50,14 @@ def get_db_connection():
         return None
 
 # -------------------- SCHEMA --------------------
+
+
 class TextInput(BaseModel):
     text: str
 
 # -------------------- API --------------------
+
+
 @app.post("/predict")
 def predict_spam(data: TextInput):
     try:
