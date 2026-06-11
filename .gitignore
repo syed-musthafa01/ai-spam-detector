@@ -1,0 +1,12 @@
+# Sensitive local files — never commit
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
