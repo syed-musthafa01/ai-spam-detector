@@ -1,6 +1,6 @@
 # AI Spam Detector
 
-A machine learning web app that classifies text messages as **Spam** or **Not Spam**, with a Python/FastAPI backend, a scikit-learn model, and a minimal HTML/JS frontend. Built with the help of AI coding tools (AI IDEs / AI models).
+A machine learning web app that classifies text messages as **Spam** or **Not Spam**, with a Python/FastAPI backend, a scikit-learn model, and a minimal HTML/JS frontend.
 
 **Live demo:** https://ai-spams-detector.netlify.app/
 
